@@ -16,6 +16,8 @@ if(isset($_POST['username']) and isset($_POST['password'])) {
 
   if(isset($_POST['auto'])) {
     $auto = $_POST['auto'];
+  } else {
+    $auto = false;
   }
 
   $user->login($username,$password,$auto);
@@ -77,7 +79,7 @@ if ($user->has_error() and isset($_POST['username'])) {
     <footer class="container">
       <p>&copy; thermatk 2013</p>
     </footer>
-    
+
     <script src="vendor/jquery-1.10.2.min.js"></script>
     <script src="vendor/bootstrap/bootstrap.min.js"></script>
   </body>
