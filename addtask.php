@@ -10,7 +10,7 @@ require("header.php");
 	<form role="form" method="post">
 		<div class="form-group">
 			<label for="taskname">Название</label>
-			<input name="taskname" type="text" class="form-control" id="taskname" placeholder="Название задания">
+			<input name="taskname" type="text" class="form-control" id="taskname" placeholder="Название задания" autofocus>
 		</div>
 		<div id="criterias">
 			<div id="pattern" style="display:none;" class="form-group">
