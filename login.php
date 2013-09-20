@@ -1,3 +1,41 @@
+<?php
+///installation
+if(!file_exists("config.php")) {  
+    header("Location: install.php");
+}
+///
+
+require_once("starter.php");
+
+if($user->signed){
+  if($user->isAdmin()) {
+    header("Location: grade.php");
+  } else {
+    header("Location: stats.php");
+  }
+}
+
+/// login
+if(isset($_POST['username']) and isset($_POST['password'])) {
+  $username = $_POST['username'];
+  $password = $_POST['password'];
+
+  if(isset($_POST['auto'])) {
+    $auto = $_POST['auto'];
+  }
+
+  $user->login($username,$password,$auto);
+
+  if($user->signed){
+    if($user->isAdmin()) {
+      header("Location: grade.php");
+    } else {
+      header("Location: stats.php");
+    }
+  }
+}
+///
+?>
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -17,13 +55,24 @@
   <body>
 
     <div class="container">
-
-      <form class="form-signin">
+<?php
+if ($user->has_error() and isset($_POST['username'])) {
+  foreach($user->error() as $err){
+?>
+<div class="alert alert-danger alert-dismissable">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  <strong>Что-то не так!</strong> Ошибка: <?php echo $err?>.
+</div>
+<?php
+  }
+}
+?>
+      <form class="form-signin" method="post">
         <h2 class="form-signin-heading">Войдите</h2>
-        <input type="text" class="form-control" placeholder="Адрес email" autofocus>
-        <input type="password" class="form-control" placeholder="Пароль">
+        <input name="username" type="text" class="form-control" placeholder="Имя пользователя" autofocus>
+        <input name="password" type="password" class="form-control" placeholder="Пароль">
         <label class="checkbox">
-          <input type="checkbox" value="remember-me"> Запомнить меня
+          <input name="auto" type="checkbox" value="remember-me"> Запомнить меня
         </label>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
       </form>
