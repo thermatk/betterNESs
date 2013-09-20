@@ -30,7 +30,7 @@ if(isset($_POST['taskname'])) {
 		}
 	}
 	if(!$error) {
-		$data["criterias"] = json_encode($criterias);
+		$data["criterias"] = json_encode($criterias, JSON_UNESCAPED_UNICODE);
 		$q = $pdodb->prepare("INSERT INTO tasks (".(implode(",",array_keys($data))).") VALUES ('".(implode("','",$data))."');")->execute();
 		if($q) {
 			?>
