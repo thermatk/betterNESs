@@ -3,6 +3,7 @@ require_once("starter.php");
 if(!($user->signed)) {
     header("Location: login.php");
 }
+$addscripts=array();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -38,7 +39,10 @@ if(!($user->signed)) {
 require_once("pagelist.php");
 foreach ($pagelist as $onepage) {
   if($onepage[2] and !($user->isAdmin())) {
-      continue;
+    if($onepage[0]==$page) {
+      header("Location: login.php");
+    }
+    continue;
   }
   $active='';
   if($onepage[0]==$page) {
