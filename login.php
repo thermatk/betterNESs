@@ -1,10 +1,4 @@
 <?php
-///installation
-if(!file_exists("config.php")) {  
-    header("Location: install.php");
-}
-///
-
 require_once("starter.php");
 
 if($user->signed){

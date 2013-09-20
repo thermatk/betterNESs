@@ -1,4 +1,10 @@
 <?php
+///installation
+if(!file_exists("config.php")) {  
+    header("Location: install.php");
+}
+///
+
 ///general
 date_default_timezone_set('UTC');
 ///
