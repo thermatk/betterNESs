@@ -8,38 +8,61 @@ require("header.php");
 <div class="row">
 <?
 if(isset($_POST['task_id'])) {
-	$data=array(
-		"grade_id"=>"",
-		"task_id"=>$_POST['task_id'],
-		"user_id"=>$_POST['task_id'],
-	);
+	$q3=$pdodb->query('SELECT * from grades WHERE task_id = "'.$_POST['task_id'].'" AND user_id = "'.$_POST['user_id'].'";');
+	$q3->setFetchMode(PDO::FETCH_ASSOC);
+	$grade = $q3->fetch();
+
 	$criterias = array();
 	foreach($_POST as $key => $value) {
 		if(substr_count($key, "-")) {
 			$key=explode("-", $key);
 			if($key[0]=="critcomment") {
-				$criterias[$key[1]]["comment"] = $value;
+				$criterias[$key[1]]["comment"] = str_replace('"', "'", $value);
 			} elseif ($key[0]=="critpoint") {
 				$criterias[$key[1]]["point"] = $value;
 			}
 		}
 	}
-	$data["grade"] = json_encode($criterias, JSON_UNESCAPED_UNICODE);
-	$q = $pdodb->prepare("INSERT INTO grades (".(implode(",",array_keys($data))).") VALUES ('".(implode("','",$data))."');")->execute();
-	if($q) {
-		?>
-		<div class="alert alert-success alert-dismissable">
-		  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-		  <strong>Успех!</strong> Оценка добавлена.
-		</div>
-		<?php
+	if(!$grade) {
+		$data=array(
+			"grade_id"=>"",
+			"task_id"=>$_POST['task_id'],
+			"user_id"=>$_POST['user_id'],
+		);
+		$data["grade"] = addslashes(json_encode($criterias, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT));
+		$q = $pdodb->prepare("INSERT INTO grades (".(implode(",",array_keys($data))).") VALUES ('".(implode("','",$data))."');")->execute();
+		if($q) {
+			?>
+			<div class="alert alert-success alert-dismissable">
+			  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			  <strong>Успех!</strong> Оценка добавлена.
+			</div>
+			<?php
+		} else {
+			?>
+			<div class="alert alert-danger alert-dismissable">
+			  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			  <strong>Что-то не так!</strong> Ошибка.
+			</div>
+			<?php
+		}
 	} else {
-		?>
-		<div class="alert alert-danger alert-dismissable">
-		  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-		  <strong>Что-то не так!</strong> Ошибка.
-		</div>
-		<?php
+		$q = $pdodb->prepare("UPDATE grades SET grade='".addslashes(json_encode($criterias, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT))."' WHERE task_id = '".$_POST['task_id']."' AND user_id = '".$_POST['user_id']."';")->execute();
+		if($q) {
+			?>
+			<div class="alert alert-success alert-dismissable">
+			  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			  <strong>Успех!</strong> Оценка обновлена.
+			</div>
+			<?php
+		} else {
+			?>
+			<div class="alert alert-danger alert-dismissable">
+			  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			  <strong>Что-то не так!</strong> Ошибка.
+			</div>
+			<?php
+		}
 	}
 }
 ?>
@@ -64,6 +87,13 @@ if(isset($_POST['task_id'])) {
 			$q2->setFetchMode(PDO::FETCH_ASSOC);
 			$s=1;
 			while($student = $q2->fetch()) {
+
+				$q3=$pdodb->query('SELECT * from grades WHERE task_id = "'.$task['task_id'].'" AND user_id = "'.$student['user_id'].'";');
+				$q3->setFetchMode(PDO::FETCH_ASSOC);
+				$grade = $q3->fetch();
+				if (isset($grade['grade'])) {
+					$grade['grade'] = json_decode($grade['grade'],true);
+				}
 			?>
 				<tr>
 		        	<td><? echo $s;?></td>
@@ -78,14 +108,21 @@ if(isset($_POST['task_id'])) {
 			            		<label for="critpoint-<? echo $key; ?>"><? echo $value['name'];?>: </label>
 							    <select class="form-control" name="critpoint-<? echo $key; ?>" id="critpoint-<? echo $key; ?>">
 							    	<?php
-							    	for ($i=0; $i <= $value["points"]; $i++) { 
-							    		echo "<option value='".$i."'>".$i."</option>";
+							    	for ($i=0; $i <= $value["points"]; $i++) {
+							    		if(isset($grade['grade'][$key]["point"]) and $grade['grade'][$key]["point"] == $i) {
+							    			echo "<option value='".$i."' selected>".$i."</option>";
+							    		} else {
+							    			echo "<option value='".$i."'>".$i."</option>";
+							    		}
 							    	}
 							    	?>
 							    </select>
 							</div>
 							<div class="form-group">
-							    <input type="text" class="form-control" name="critcomment-<? echo $key; ?>" placeholder="Комментарий">
+							    <input type="text" class="form-control" name="critcomment-<? echo $key; ?>" placeholder="Комментарий" value="<?
+							    if(isset($grade['grade'][$key]["comment"])) {
+							    	echo $grade['grade'][$key]["comment"];
+							    } ?>">
 							</div>
 		            		<?php
 		            	}
