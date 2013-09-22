@@ -102,14 +102,17 @@ if ($user->has_error() and isset($_POST['username'])) {
       <?php
 		$q=$pdodb->query('SELECT * from regusers;');
 		$q->setFetchMode(PDO::FETCH_ASSOC);
-		while($user = $q->fetch()) {
+		if($q->rowCount()) {
+		
       ?>
       <form class="form-signin" method="post">
         <h2 class="form-signin-heading">Зарегистрируйтесь</h2>
         <div class="form-group">
           <select class="form-control" name="newuseremail">
             <?php
+            while($user = $q->fetch()) {
               echo "<option value='".$user['regusers_id']."'>".$user['regusersemail']."</option>";
+          	}
             ?>
           </select>
         </div>
