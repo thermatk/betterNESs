@@ -29,6 +29,33 @@ if(isset($_POST['username']) and isset($_POST['password'])) {
       header("Location: stats.php");
     }
   }
+} elseif (isset($_POST['newuseremail'])) {
+  $q=$pdodb->query('SELECT * from regusers WHERE regusers_id = "'.$_POST['newuseremail'].'";');  
+  $q->setFetchMode(PDO::FETCH_ASSOC);
+  $newuser = $q->fetch();
+  if($newuser) {
+    $email = '<html><head><title>Аккаунт на "'.$_SERVER['HTTP_HOST'].'" </title></head><body>Ваш новый аккаунт на <a href="http://'. $_SERVER['HTTP_HOST'].'/login.php">http://'. $_SERVER['HTTP_HOST'].'/</a> создан. Имя пользователя: '.explode("@",$newuser['regusersemail'])[0].', пароль: '.$newuser['reguserspass'].'</body></html>';
+    $headers = 'From: betterNESs <neverreply@'.$_SERVER['HTTP_HOST']  . ">\r\n" .
+    'Reply-To: betterNESs <neverreply@'.$_SERVER['HTTP_HOST']  . ">\r\n" .
+    'Content-type: text/html; charset=utf-8' . '\r\n'.
+    'X-Mailer: PHP/' . phpversion();
+    if(mail($newuser['regusersemail'], 'Аккаунт на '.$_SERVER['HTTP_HOST'], $email, $headers)) {
+        $q2=$pdodb->exec('DELETE from regusers WHERE regusers_id = "'.$_POST['newuseremail'].'";'); 
+        ?>
+        <div class="alert alert-success alert-dismissable">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <strong>Успех!</strong> Письмо отправлено.
+        </div>
+        <?php
+    } else {
+      ?>
+      <div class="alert alert-danger alert-dismissable">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <strong>Что-то не так!</strong> Ошибка.
+      </div>
+      <?php
+    }
+  }
 }
 ///
 ?>
@@ -71,6 +98,21 @@ if ($user->has_error() and isset($_POST['username'])) {
           <input name="auto" type="checkbox" value="remember-me"> Запомнить меня
         </label>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+      </form>
+      <form class="form-signin" method="post">
+        <h2 class="form-signin-heading">Зарегистрируйтесь</h2>
+        <div class="form-group">
+          <select class="form-control" name="newuseremail">
+            <?php
+            $q=$pdodb->query('SELECT * from regusers;');
+            $q->setFetchMode(PDO::FETCH_ASSOC);
+            while($user = $q->fetch()) {
+              echo "<option value='".$user['regusers_id']."'>".$user['regusersemail']."</option>";
+            }
+            ?>
+          </select>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Получить пароль!</button>
       </form>
 
     </div>
