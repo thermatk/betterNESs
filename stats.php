@@ -23,8 +23,7 @@ require("header.php");
 	          	}
 	          	foreach ($criteria as $key => $value) {
 	          		$value = get_object_vars($value);
-	          		echo "<th>".$value['name'].", баллов</th>";
-	          		echo "<th>".$value['name'].", комментарий</th>";
+	          		echo "<th>".$value['name']."</th>";
 	          	?>
 	            	
 	            <?php
@@ -50,16 +49,13 @@ require("header.php");
 		            	$totalpoints+=$grade['grade'][$key]["point"];
 		            	?>
 		            <td>
-						<? echo $grade['grade'][$key]["point"];?>
-					</td>
-					<td>
-					<? echo $grade['grade'][$key]["comment"];?>
-		            </td>		            
+						<? echo "<strong>(".$grade['grade'][$key]["point"].")</strong> ".$grade['grade'][$key]["comment"];?>
+					</td>		            
 					<?php
 					}					
 					echo "<td>".$totalpoints."</td>";
 				} else {
-					echo "<td colspan='".(count($criteria)*2+1)."'>Ещё не проверено</td>";
+					echo "<td colspan='".(count($criteria)+1)."'>Ещё не проверено</td>";
 				}
 				?>
 	        	</tr>
@@ -85,10 +81,7 @@ require("header.php");
 		            	$totalpoints+=$grade['grade'][$key]["point"];
 		            	?>
 		            <td>
-						<? echo $grade['grade'][$key]["point"];?>
-					</td>
-					<td>
-					<? echo $grade['grade'][$key]["comment"];?>
+						<? echo "<strong>(".$grade['grade'][$key]["point"].")</strong> ".$grade['grade'][$key]["comment"];?>
 		            </td>		            
 					<?php
 					}					
