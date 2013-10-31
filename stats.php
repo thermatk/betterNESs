@@ -23,7 +23,7 @@ require("header.php");
 	          	}
 	          	foreach ($criteria as $key => $value) {
 	          		$value = get_object_vars($value);
-	          		echo "<th>".$value['name']."</th>";
+	          		echo "<th>".$value['name']."(".$value['points'].")</th>";
 	          	?>
 	            	
 	            <?php
