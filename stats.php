@@ -69,7 +69,16 @@ require("header.php");
 				<tr>
 				<?php
 				echo "<td>".$s."</td>";
-				echo "<td>".$student['username']."</td>";
+
+				$qusername=$pdodb->query('SELECT * from users_names WHERE user_email = "'.$student['username'].'@nes.ru";');
+				$qusername->setFetchMode(PDO::FETCH_ASSOC);
+				$studname=$qusername->fetch();
+				if (isset($studname['user_name'])) {
+					echo "<td>".$studname['user_name']."</td>";
+				} else {
+					echo "<td>".$student['username']."</td>";
+				}
+				
 				$q3=$pdodb->query('SELECT * from grades WHERE task_id = "'.$task['task_id'].'" AND user_id = "'.$student['user_id'].'";');
 				$q3->setFetchMode(PDO::FETCH_ASSOC);
 				$grade = $q3->fetch();
